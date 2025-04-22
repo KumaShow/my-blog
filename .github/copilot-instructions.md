@@ -94,7 +94,7 @@
 
 ## 6. 設計與樣式 (Design & Styling)
 
-*   **主要工具:** Tailwind CSS。
+*   **主要工具:** Tailwind CSS（^4.1.3）。
 *   **設定檔:** `global.css` 用於定義主題 (顏色、字體、間距等)。
 *   **全域樣式:** 基礎樣式、字體載入等可放在 `src/styles/global.css` 中，並在 `BaseLayout.astro` 引入。
 *   **元件樣式:** 主要透過在 Astro 或 UI 框架元件的 `class` 屬性中直接應用 Tailwind Utility Classes。避免濫用 `@apply`。
