@@ -69,7 +69,7 @@
     *   顯示完整的文章內容 (Markdown/MDX 渲染)。
     *   包含文章標題、發布日期、作者 (若適用)、標籤。
     *   程式碼區塊語法高亮。
-    *   (可選) 相關文章推薦。
+    *   (可選) 相關文章推薦：基於相同的標籤 (tags) 或分類 (category) 進行推薦。
     *   (可選) 社群分享按鈕。
 *   **內容管理 (Content Management):**
     *   使用 `src/content/blog/` 目錄存放 `.md` 或 `.mdx` 文件。
@@ -95,11 +95,11 @@
 ## 6. 設計與樣式 (Design & Styling)
 
 *   **主要工具:** Tailwind CSS（^4.1.3）。
-*   **設定檔:** `global.css` 用於定義主題 (顏色、字體、間距等)。
+*   **設定檔:** 使用 @theme 指令於 `global.css` 定義主題 (顏色、字體、間距等)與自訂。
 *   **全域樣式:** 基礎樣式、字體載入等可放在 `src/styles/global.css` 中，並在 `BaseLayout.astro` 引入。
 *   **元件樣式:** 主要透過在 Astro 或 UI 框架元件的 `class` 屬性中直接應用 Tailwind Utility Classes。避免濫用 `@apply`。
 *   **字體:** 選擇合適的網頁字體，並在 Tailwind 設定檔或全域 CSS 中配置。
-*   **深色模式 (Dark Mode):** (可選) 透過 Tailwind 的 `dark:` variant 實作。
+*   **深色模式 (Dark Mode):** 透過 Tailwind 的 `dark:` variant 實作，並使用 localStorage 儲存使用者偏好。
 
 ## 7. 開發工作流程 (Development Workflow)
 
