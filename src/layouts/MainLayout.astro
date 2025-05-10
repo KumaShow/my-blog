@@ -5,7 +5,7 @@ import BaseHead from '@components/BaseHead.astro';
 import { SITE_TITLE, SITE_DESCRIPTION } from '../consts';
 
 const { title = SITE_TITLE, description = SITE_DESCRIPTION } = Astro.props;
-const GA_ID = import.meta.env.PUBLIC_GA_ID;
+const GA_ID = 'G-3MZ16B4LH6';
 ---
 <!doctype html>
 <html lang="zh-hant">
@@ -13,12 +13,12 @@ const GA_ID = import.meta.env.PUBLIC_GA_ID;
     <BaseHead title={title} description={description} />
     {GA_ID && (
       <>
-        <script async src={`https://www.googletagmanager.com/gtag/js?id=${GA_ID}`}></script>
-        <script is:inline>
+        <script type="text/partytown" async src={`https://www.googletagmanager.com/gtag/js?id=${GA_ID}`}></script>
+        <script type="text/partytown" is:inline>
           window.dataLayer = window.dataLayer || [];
           function gtag(){dataLayer.push(arguments);}
           gtag('js', new Date());
-          gtag('config', '{GA_ID}');
+          gtag('config', '${GA_ID}');
         </script>
       </>
     )}
