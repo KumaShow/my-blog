@@ -1,68 +1,53 @@
-# Astro Starter Kit: Blog
+# 技術深淵 (Tech Abyss)
 
-```sh
-npm create astro@latest -- --template blog
-```
+![Project Banner](public/blog-placeholder-about.jpg)
 
-[![Open in StackBlitz](https://developer.stackblitz.com/img/open_in_stackblitz.svg)](https://stackblitz.com/github/withastro/astro/tree/latest/examples/blog)
-[![Open with CodeSandbox](https://assets.codesandbox.io/github/button-edit-lime.svg)](https://codesandbox.io/p/sandbox/github/withastro/astro/tree/latest/examples/blog)
-[![Open in GitHub Codespaces](https://github.com/codespaces/badge.svg)](https://codespaces.new/withastro/astro?devcontainer_path=.devcontainer/blog/devcontainer.json)
+HI！我是 Benson，一名前端工程師，這裡是我的個人技術筆記。用於紀錄學習過程中的一些技術文章、筆記、心得等。本專案使用 Astro 框架建置。
 
-> 🧑‍🚀 **Seasoned astronaut?** Delete this file. Have fun!
+## 🛠️ 技術堆疊
 
-![blog](https://github.com/withastro/astro/assets/2244813/ff10799f-a816-4703-b967-c78997e8323d)
+本部落格採用以下技術構建：
 
-Features:
+-   **核心框架**: [Astro 5](https://astro.build/) - 以內容為中心的網頁框架，效能極佳。
+-   **樣式**: [Tailwind CSS 4](https://tailwindcss.com/) - 實用優先的 CSS 框架。
+-   **內容管理**: MDX & Markdown - 支援在 Markdown 中使用元件。
+-   **整合工具**:
+    -   `@astrojs/sitemap`: 自動生成網站地圖。
+    -   `@astrojs/rss`: 生成 RSS 訂閱源。
+    -   `@astrojs/partytown`: 將第三方腳本移至 Web Worker 執行。
 
-- ✅ Minimal styling (make it your own!)
-- ✅ 100/100 Lighthouse performance
-- ✅ SEO-friendly with canonical URLs and OpenGraph data
-- ✅ Sitemap support
-- ✅ RSS Feed support
-- ✅ Markdown & MDX support
-
-## 🚀 Project Structure
-
-Inside of your Astro project, you'll see the following folders and files:
+## 📂 專案結構
 
 ```text
-├── public/
+├── public/       # 靜態資源（圖片、字型等）
 ├── src/
-│   ├── components/
-│   ├── content/
-│   ├── layouts/
-│   └── pages/
-├── astro.config.mjs
-├── README.md
-├── package.json
-└── tsconfig.json
+│   ├── components/ # 通用元件
+│   ├── content/    # 內容集合（部落格文章等）
+│   ├── layouts/    # 頁面佈局
+│   ├── pages/      # 頁面路由與進入點
+│   ├── styles/     # 全域樣式
+│   └── consts.ts   # 全域常數設定
+└── astro.config.mjs # Astro 設定檔
 ```
 
-Astro looks for `.astro` or `.md` files in the `src/pages/` directory. Each page is exposed as a route based on its file name.
+## 🧞‍♂️ 常用指令
 
-There's nothing special about `src/components/`, but that's where we like to put any Astro/React/Vue/Svelte/Preact components.
+所有指令皆在專案根目錄下執行：
 
-The `src/content/` directory contains "collections" of related Markdown and MDX documents. Use `getCollection()` to retrieve posts from `src/content/blog/`, and type-check your frontmatter using an optional schema. See [Astro's Content Collections docs](https://docs.astro.build/en/guides/content-collections/) to learn more.
+| 指令 | 說明 |
+| :--- | :--- |
+| `npm run dev` | 啟動本機開發伺服器 (預設於 `localhost:4321`) |
+| `npm run build` | 建置生產環境版本至 `./dist/` |
+| `npm run preview` | 在本機預覽建置後的版本 |
+| `npm run lint` | 執行 ESLint 檢查程式碼品質 |
+| `npm run format` | 使用 Prettier 格式化程式碼 |
 
-Any static assets, like images, can be placed in the `public/` directory.
+## 📝 開發筆記
 
-## 🧞 Commands
+-   文章位於 `src/content/blog/` 目錄下。
+-   全域資訊（標題、描述）可於 `src/consts.ts` 中修改。
+-   本專案已配置路徑別名（Aliases），例如 `@components` 指向 `src/components`。
 
-All commands are run from the root of the project, from a terminal:
+## 授權
 
-| Command                   | Action                                           |
-| :------------------------ | :----------------------------------------------- |
-| `npm install`             | Installs dependencies                            |
-| `npm run dev`             | Starts local dev server at `localhost:4321`      |
-| `npm run build`           | Build your production site to `./dist/`          |
-| `npm run preview`         | Preview your build locally, before deploying     |
-| `npm run astro ...`       | Run CLI commands like `astro add`, `astro check` |
-| `npm run astro -- --help` | Get help using the Astro CLI                     |
-
-## 👀 Want to learn more?
-
-Check out [our documentation](https://docs.astro.build) or jump into our [Discord server](https://astro.build/chat).
-
-## Credit
-
-This theme is based off of the lovely [Bear Blog](https://github.com/HermanMartinus/bearblog/).
+本專案基於 Astro Blog Starter 修改。
