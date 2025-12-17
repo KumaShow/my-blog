@@ -1,5 +1,7 @@
 # 技術深淵 (Tech Abyss)
 
+[![CI](https://github.com/KumaShow/my-blog/actions/workflows/ci.yml/badge.svg)](https://github.com/KumaShow/my-blog/actions/workflows/ci.yml)
+
 ![Project Banner](public/blog-placeholder-about.jpg)
 
 HI！我是 Benson，一名前端工程師，這裡是我的個人技術筆記。用於紀錄學習過程中的一些技術文章、筆記、心得等。本專案使用 Astro 框架建置。
