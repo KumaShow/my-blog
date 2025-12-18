@@ -5,9 +5,9 @@ import '../styles/global.css';
 import { SITE_TITLE } from '../consts';
 
 interface Props {
-	title: string;
-	description: string;
-	image?: string;
+  title: string;
+  description: string;
+  image?: string;
 }
 
 const canonicalURL = new URL(Astro.url.pathname, Astro.site);
@@ -21,25 +21,35 @@ const { title, description, image = '/blog-placeholder-1.jpg' } = Astro.props;
 <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
 <link rel="sitemap" href="/sitemap-index.xml" />
 <link
-	rel="alternate"
-	type="application/rss+xml"
-	title={SITE_TITLE}
-	href={new URL('rss.xml', Astro.site)}
+  rel="alternate"
+  type="application/rss+xml"
+  title={SITE_TITLE}
+  href={new URL('rss.xml', Astro.site)}
 />
 <meta name="generator" content={Astro.generator} />
 
 <!-- Google Analytics - 只在生產環境中載入 -->
-{import.meta.env.PROD && (
-  <>
-    <script type="text/partytown" async src={`https://www.googletagmanager.com/gtag/js?id=G-3MZ16B4LH6`}></script>
-    <script type="text/partytown" is:inline>
+{
+  import.meta.env.PROD && (
+    <>
+      <script
+        type="text/partytown"
+        async
+        src={`https://www.googletagmanager.com/gtag/js?id=G-3MZ16B4LH6`}
+      />
+      <script
+        type="text/partytown"
+        is:inline
+        set:html={`
       window.dataLayer = window.dataLayer || [];
       function gtag(){dataLayer.push(arguments);}
       gtag('js', new Date());
       gtag('config', 'G-3MZ16B4LH6');
-    </script>
-  </>
-)}
+      `}
+      />
+    </>
+  )
+}
 
 <!-- Font preloads -->
 <link rel="preload" href="/fonts/atkinson-regular.woff" as="font" type="font/woff" crossorigin />
