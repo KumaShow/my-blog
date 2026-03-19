@@ -57,7 +57,7 @@
 ## 4. Performance
 
 *   **Minimize Client-Side JS:** Reiterate checking `client:*` directives.
-*   **Asset Optimization:** Check image optimization (consider Astro's `` or ``).
+*   **Asset Optimization:** Check image optimization (consider using `Image` or `Picture` from `astro:assets` when appropriate).
 *   **Code Splitting:** Check for unusually large JS chunks.
 *   **Efficient Data Loading:** Ensure data fetching is optimal (build vs. request time).
 
