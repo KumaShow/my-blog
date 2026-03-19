@@ -47,7 +47,7 @@
 │ ├── styles/ # 全域 CSS 樣式 (e.g., global.css, 包含 Tailwind 的樣式)
 │ └── env.d.ts # TypeScript 環境定義
 ├── .github/
-| ├── copilot/ # (可選) GitHub Copilot 設定
+│ ├── copilot/ # (可選) GitHub Copilot 設定
 │ └── workflows/ # (可選) GitHub Actions 工作流程 (若需更複雜 CI)
 ├── .gitignore
 ├── .prettierrc # (建議) Prettier 格式化設定
