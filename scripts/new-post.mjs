@@ -12,7 +12,7 @@
  */
 
 import { mkdirSync, readdirSync, writeFileSync, existsSync } from 'node:fs';
-import { dirname, join, resolve } from 'node:path';
+import { dirname, join, resolve, sep } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { createInterface } from 'node:readline';
 
@@ -60,23 +60,41 @@ function slugify(text) {
     .replace(/^-+|-+$/g, '');        // trim leading/trailing hyphens
 }
 
+function hasPathSeparators(value) {
+  return /[\\/]/.test(value);
+}
+
+function hasDotSegments(value) {
+  return /(^|[\\/])\.\.([\\/]|$)/.test(value);
+}
+
 /**
- * Sanitize a user-provided slug: always run through slugify to strip any
- * dangerous characters, then enforce the length limit.
+ * Sanitize a user-provided slug.
+ * Reject obvious path traversal attempts, then normalize to a safe slug.
  */
 function sanitizeSlug(raw) {
-  const s = slugify(raw);
+  const value = raw.trim();
+  if (!value) return '';
+  if (hasPathSeparators(value) || hasDotSegments(value)) {
+    throw new Error('Slug 不能包含路徑分隔符或 ".."。');
+  }
+  const s = slugify(value);
   if (s.length > MAX_SLUG_LEN) return s.slice(0, MAX_SLUG_LEN).replace(/-+$/, '');
   return s;
 }
 
 /**
  * Sanitize a category to a safe single path segment.
- * Only allows lowercase letters, digits, and hyphens.
  * Rejects anything containing path separators or dot-sequences.
  */
 function sanitizeCategory(raw) {
-  const normalized = raw
+  const value = raw.trim();
+  if (!value) return '';
+  if (hasPathSeparators(value) || hasDotSegments(value)) {
+    throw new Error('分類不能包含路徑分隔符或 ".."。');
+  }
+
+  const normalized = value
     .toLowerCase()
     .normalize('NFKD')
     .replace(/[\u0300-\u036f]/g, '')
@@ -113,7 +131,7 @@ function assertInsideRoot(target, root) {
   const resolvedTarget = resolve(target);
   const resolvedRoot = resolve(root);
   // resolvedRoot must be a prefix followed by a separator (or be equal)
-  if (resolvedTarget !== resolvedRoot && !resolvedTarget.startsWith(resolvedRoot + '/')) {
+  if (resolvedTarget !== resolvedRoot && !resolvedTarget.startsWith(resolvedRoot + sep)) {
     throw new Error(`路徑逸出限制目錄：${resolvedTarget}`);
   }
 }
@@ -216,11 +234,12 @@ async function main() {
     description = description.slice(0, MAX_DESCRIPTION_LEN);
   }
   if (!heroImage) heroImage = DEFAULT_HERO_IMAGE;
+  const escapedHeroImage = heroImage.replace(/'/g, "''");
   const content = `---
 title: '${title.replace(/'/g, "''")}'
 description: '${description.replace(/'/g, "''")}'
 pubDate: '${pubDate}'
-heroImage: '${heroImage}'
+heroImage: '${escapedHeroImage}'
 ---
 
 ## ${title}

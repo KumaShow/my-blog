@@ -43,10 +43,13 @@ HI！我是 Benson，一名前端工程師，這裡是我的個人技術筆記�
 | `npm run preview` | 在本機預覽建置後的版本 |
 | `npm run lint` | 執行 ESLint 檢查程式碼品質 |
 | `npm run format` | 使用 Prettier 格式化程式碼 |
+| `npm run new-post -- "標題" [--slug xxx] [--year yyyy] [--category cat] [--description desc] [--hero-image path]` | 建立新部落格文章，支援自訂 slug、年份、分類、描述、封面圖 |
 
 ## 📝 開發筆記
 
 -   文章位於 `src/content/blog/` 目錄下。
+-   可使用 `npm run new-post -- "標題"` 建立文章草稿；若未帶標題，腳本會改為互動式輸入。
+-   新文章會建立在目前最新年份資料夾下的 `uncategorized/`，之後可再手動搬移到正式分類。
 -   全域資訊（標題、描述）可於 `src/consts.ts` 中修改。
 -   本專案已配置路徑別名（Aliases），例如 `@components` 指向 `src/components`。
 
