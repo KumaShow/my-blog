@@ -1,0 +1,6 @@
+{
+  "label": "範本示範",
+  "description": "Astro 官方範本自帶的示範文章與測試文章，保留作為 Markdown / MDX 語法參考。",
+  "icon": "🧪",
+  "order": 999
+}
