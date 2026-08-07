@@ -28,7 +28,9 @@
 - **`/src`**: 原始碼目錄
   - **`/components`**: 通用 UI 元件 (如 `BaseHead.astro`, `Header.astro`, `Footer.astro`)。
   - **`/content`**: 內容集合 (Content Collections)。
-    - **`/blog`**: 部落格文章存放處 (按年份資料夾分類，如 `2025/`)。
+    - **`/blog`**: 部落格文章存放處，按主題分類資料夾存放 (如 `nodejs/`)，**路徑第一段即 category**。
+    - **`/categories`**: 分類 metadata (一個分類一個 JSON，檔名即 category slug)。
+  - **`/utils`**: 共用邏輯。`posts.ts` 是文章資料存取層 (draft 過濾與排序)。
   - **`/layouts`**: 頁面佈局元件 (如 `MainLayout.astro`, `BlogPost.astro`)。
   - **`/pages`**: 頁面路由與進入點 (File-based Routing)。
     - **`rss.xml.js`**: RSS 生成邏輯。
@@ -72,8 +74,11 @@
 
 ### C. 內容管理 (Content Management)
 
-- 新增部落格文章時，請放入 `src/content/blog/{YYYY}/{category}/` 目錄下。
-- 必須包含完整的 Frontmatter (標題、日期、描述、圖片等)，以符合 `content.config.ts` 中的 Schema 定義。
+- 新增部落格文章時，請放入 `src/content/blog/{category}/` 目錄下（建議使用 `npm run new-post` 腳手架）。
+- category 由路徑第一段推導，frontmatter **不設** `category` 欄位；分類資料夾必須有對應的 `src/content/categories/{category}.json`，否則 build 失敗。
+- 必須包含完整的 Frontmatter (標題、日期、描述等)，以符合 `content.config.ts` 中的 Schema 定義；tags 一律使用小寫 slug。
+- 頁面取文章一律透過 `@utils/posts` 的 helpers（如 `getPublishedPosts()`），**禁止**直接呼叫 `getCollection('blog')`，以確保 draft 過濾與排序規則一致。
+- 完整改版規劃見 `docs/blog-design-plan.md`。
 
 ---
 
