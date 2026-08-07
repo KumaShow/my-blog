@@ -3,15 +3,26 @@
 /**
  * new-post.mjs – 快速建立部落格文章的 helper script
  *
- * Usage:
- *   npm run new-post -- "文章標題"
- *   node scripts/new-post.mjs "文章標題"
- *   node scripts/new-post.mjs --title "文章標題" --slug my-slug --year 2025 --category dev
+ * 文章路徑：src/content/blog/<category>/<slug>.md（category 由路徑決定，不寫入 frontmatter）
+ * 分類必須先存在 src/content/categories/<category>.json，否則直接失敗。
  *
- * 若未提供標題，會以互動式 prompt 要求輸入。
+ * Usage:
+ *   npm run new-post -- --title "文章標題" --category nodejs
+ *   npm run new-post -- --title "NodeJS｜全域物件與執行環境" --category nodejs --tags nodejs,runtime --order 1
+ *   node scripts/new-post.mjs "文章標題"            # 互動式詢問缺少的欄位
+ *
+ * Options:
+ *   --title <text>        文章標題（必填，未提供時互動詢問）
+ *   --category <slug>     分類（必填，未提供時互動詢問；須已存在對應 JSON）
+ *   --slug <slug>         自訂 slug（預設由標題產生）
+ *   --tags a,b,c          逗號分隔的 tags（小寫 slug 格式）
+ *   --order <n>           系列內閱讀順序（正整數）
+ *   --description <text>  文章描述（預設同標題）
+ *   --hero-image <path>   封面圖（public 絕對路徑）
+ *   --draft / --no-draft  是否為草稿（預設 --draft）
  */
 
-import { mkdirSync, readdirSync, writeFileSync, existsSync } from 'node:fs';
+import { mkdirSync, writeFileSync, existsSync } from 'node:fs';
 import { dirname, join, resolve, sep } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { createInterface } from 'node:readline';
@@ -24,26 +35,39 @@ import { createInterface } from 'node:readline';
 const __dirname = dirname(fileURLToPath(import.meta.url));
 
 const BLOG_ROOT = resolve(join(__dirname, '..', 'src', 'content', 'blog'));
+const CATEGORIES_ROOT = resolve(join(__dirname, '..', 'src', 'content', 'categories'));
 const DEFAULT_HERO_IMAGE = '/blog/blog-placeholder-1.jpg';
-const DEFAULT_CATEGORY = 'uncategorized';
+
+// 與 src/content.config.ts 的 SLUG_PATTERN 一致
+const SLUG_PATTERN = /^[a-z0-9]+(-[a-z0-9]+)*$/;
 
 // Reasonable length limits
 const MAX_TITLE_LEN = 200;
 const MAX_SLUG_LEN = 100;
 const MAX_CATEGORY_LEN = 60;
+const MIN_DESCRIPTION_LEN = 10;
 const MAX_DESCRIPTION_LEN = 300;
 
 // ---------------------------------------------------------------------------
 // Helpers
 // ---------------------------------------------------------------------------
 
-/** Prompt the user for input via stdin. */
+/**
+ * Prompt the user for input via stdin.
+ * 非互動環境（stdin 已關閉 / EOF）時 resolve 空字串，讓呼叫端以「空值」錯誤退出，
+ * 避免 promise 永不 resolve 導致程序默默以 exit 0 結束。
+ */
 function prompt(question) {
   const rl = createInterface({ input: process.stdin, output: process.stdout });
   return new Promise((resolve) => {
+    let answered = false;
     rl.question(question, (answer) => {
+      answered = true;
       rl.close();
       resolve(answer.trim());
+    });
+    rl.on('close', () => {
+      if (!answered) resolve('');
     });
   });
 }
@@ -54,10 +78,10 @@ function slugify(text) {
     .toLowerCase()
     .normalize('NFKD')
     .replace(/[\u0300-\u036f]/g, '') // strip diacritics
-    .replace(/[^\w\s-]/g, '')        // remove non-word chars
-    .replace(/[\s_]+/g, '-')         // spaces / underscores → hyphens
-    .replace(/-+/g, '-')             // collapse consecutive hyphens
-    .replace(/^-+|-+$/g, '');        // trim leading/trailing hyphens
+    .replace(/[^\w\s-]/g, '') // remove non-word chars
+    .replace(/[\s_]+/g, '-') // spaces / underscores → hyphens
+    .replace(/-+/g, '-') // collapse consecutive hyphens
+    .replace(/^-+|-+$/g, ''); // trim leading/trailing hyphens
 }
 
 function hasPathSeparators(value) {
@@ -99,28 +123,12 @@ function sanitizeCategory(raw) {
     .normalize('NFKD')
     .replace(/[\u0300-\u036f]/g, '')
     .replace(/[\s_]+/g, '-')
-    .replace(/[^a-z0-9-]/g, '')  // only allow safe chars
+    .replace(/[^a-z0-9-]/g, '') // only allow safe chars
     .replace(/-+/g, '-')
     .replace(/^-+|-+$/g, '');
-  if (normalized.length > MAX_CATEGORY_LEN) return normalized.slice(0, MAX_CATEGORY_LEN).replace(/-+$/, '');
+  if (normalized.length > MAX_CATEGORY_LEN)
+    return normalized.slice(0, MAX_CATEGORY_LEN).replace(/-+$/, '');
   return normalized;
-}
-
-/**
- * Detect the latest year folder inside BLOG_ROOT.
- * If none exists, returns the current year as a string.
- */
-function getLatestYear() {
-  if (!existsSync(BLOG_ROOT)) {
-    return String(new Date().getFullYear());
-  }
-
-  const years = readdirSync(BLOG_ROOT, { withFileTypes: true })
-    .filter((d) => d.isDirectory() && /^\d{4}$/.test(d.name))
-    .map((d) => d.name)
-    .sort();
-
-  return years.length > 0 ? years[years.length - 1] : String(new Date().getFullYear());
 }
 
 /**
@@ -145,29 +153,38 @@ function today() {
   return `${yyyy}-${mm}-${dd}`;
 }
 
+/** Escape a value for a single-quoted YAML string. */
+function yamlQuote(value) {
+  return `'${value.replace(/'/g, "''")}'`;
+}
+
 // ---------------------------------------------------------------------------
 // Main
 // ---------------------------------------------------------------------------
 
 async function main() {
   // --- CLI Args Parsing ---
-  // 支援參數: --slug, --year, --category, --description, --hero-image, --title
   const args = process.argv.slice(2);
   let title = '';
   let slug = '';
-  let year = '';
   let category = '';
   let description = '';
   let heroImage = '';
-  // 簡單參數解析 (僅 Node 內建)
+  let tagsInput = '';
+  let orderInput = '';
+  let draft = true; // 新文章預設為草稿
+
   for (let i = 0; i < args.length; i++) {
     const arg = args[i];
     if (arg === '--slug') slug = args[++i]?.trim() ?? '';
-    else if (arg === '--year') year = args[++i]?.trim() ?? '';
     else if (arg === '--category') category = args[++i]?.trim() ?? '';
     else if (arg === '--description') description = args[++i]?.trim() ?? '';
     else if (arg === '--hero-image') heroImage = args[++i]?.trim() ?? '';
     else if (arg === '--title') title = args[++i]?.trim() ?? '';
+    else if (arg === '--tags') tagsInput = args[++i]?.trim() ?? '';
+    else if (arg === '--order') orderInput = args[++i]?.trim() ?? '';
+    else if (arg === '--draft') draft = true;
+    else if (arg === '--no-draft') draft = false;
     else if (!arg.startsWith('--') && !title) title = arg.trim();
   }
 
@@ -184,7 +201,27 @@ async function main() {
     process.exit(1);
   }
 
-  // 2. Resolve slug — always sanitize even when user-provided
+  // 2. Resolve category — must already exist in src/content/categories/
+  //    （先檢查分類再處理 slug，讓「分類不存在」能及早失敗）
+  if (!category) {
+    category = await prompt('請輸入分類 (category slug，如 nodejs): ');
+  }
+  category = sanitizeCategory(category);
+  if (!category || !SLUG_PATTERN.test(category)) {
+    console.error('❌ 分類名稱無效，請使用小寫英文字母、數字和連字號。');
+    process.exit(1);
+  }
+  const categoryFile = join(CATEGORIES_ROOT, `${category}.json`);
+  assertInsideRoot(categoryFile, CATEGORIES_ROOT);
+  if (!existsSync(categoryFile)) {
+    console.error(
+      `❌ 分類 "${category}" 不存在，請先建立 src/content/categories/${category}.json\n` +
+        `   （欄位：label、description、icon、order，範本見 docs/blog-design-plan.md §3.3）`
+    );
+    process.exit(1);
+  }
+
+  // 3. Resolve slug — always sanitize even when user-provided
   if (slug) {
     slug = sanitizeSlug(slug);
   }
@@ -198,26 +235,36 @@ async function main() {
     process.exit(1);
   }
 
-  // 3. Determine year
-  if (!year) year = getLatestYear();
-  if (!/^[0-9]{4}$/.test(year)) {
-    console.error('❌ 年份格式錯誤，請輸入 4 位數年份 (YYYY)。');
+  // 4. Parse tags — must match SLUG_PATTERN, no duplicates
+  const tags = tagsInput
+    ? tagsInput
+        .split(',')
+        .map((t) => t.trim())
+        .filter(Boolean)
+    : [];
+  for (const tag of tags) {
+    if (!SLUG_PATTERN.test(tag)) {
+      console.error(`❌ tag "${tag}" 格式無效，必須是小寫 slug（如 nodejs、web-api）。`);
+      process.exit(1);
+    }
+  }
+  if (new Set(tags).size !== tags.length) {
+    console.error('❌ tags 不得重複。');
     process.exit(1);
   }
 
-  // 4. Determine category — sanitize to a safe single path segment
-  if (category) {
-    category = sanitizeCategory(category);
-    if (!category) {
-      console.error('❌ 分類名稱包含無效字元，請使用英文字母、數字和連字號。');
+  // 5. Parse order — positive integer if provided
+  let order;
+  if (orderInput) {
+    order = Number(orderInput);
+    if (!Number.isInteger(order) || order <= 0) {
+      console.error('❌ order 必須是正整數。');
       process.exit(1);
     }
-  } else {
-    category = DEFAULT_CATEGORY;
   }
 
-  // 5. Determine file path & guard against path traversal
-  const dir = join(BLOG_ROOT, year, category);
+  // 6. Determine file path & guard against path traversal
+  const dir = join(BLOG_ROOT, category);
   const filePath = join(dir, `${slug}.md`);
   try {
     assertInsideRoot(dir, BLOG_ROOT);
@@ -227,28 +274,42 @@ async function main() {
     process.exit(1);
   }
 
-  // 6. Build file content
-  const pubDate = today();
+  // 7. Build file content
   if (!description) description = title;
+  if (description.length < MIN_DESCRIPTION_LEN) {
+    console.error(`❌ 描述至少需 ${MIN_DESCRIPTION_LEN} 字元（schema 限制），請用 --description 提供。`);
+    process.exit(1);
+  }
   if (description.length > MAX_DESCRIPTION_LEN) {
     description = description.slice(0, MAX_DESCRIPTION_LEN);
   }
   if (!heroImage) heroImage = DEFAULT_HERO_IMAGE;
-  const escapedHeroImage = heroImage.replace(/'/g, "''");
-  const content = `---
-title: '${title.replace(/'/g, "''")}'
-description: '${description.replace(/'/g, "''")}'
-pubDate: '${pubDate}'
-heroImage: '${escapedHeroImage}'
----
+  if (!heroImage.startsWith('/')) {
+    console.error('❌ hero image 必須是 public 絕對路徑（以 / 開頭，如 /blog/cover.jpg）。');
+    process.exit(1);
+  }
+
+  const frontmatter = [
+    '---',
+    `title: ${yamlQuote(title)}`,
+    `description: ${yamlQuote(description)}`,
+    `pubDate: ${yamlQuote(today())}`,
+    `heroImage: ${yamlQuote(heroImage)}`,
+    `tags: [${tags.map(yamlQuote).join(', ')}]`,
+    ...(order !== undefined ? [`order: ${order}`] : []),
+    `draft: ${draft}`,
+    '---',
+  ].join('\n');
+
+  const content = `${frontmatter}
 
 ## ${title}
 
 在這裡開始撰寫你的文章...
 `;
 
-  // 7. Write file atomically using flag 'wx': fails if file already exists,
-  //    eliminating the TOCTOU race between the old existsSync + writeFileSync.
+  // 8. Write file atomically using flag 'wx': fails if file already exists,
+  //    eliminating the TOCTOU race between existsSync + writeFileSync.
   mkdirSync(dir, { recursive: true });
   try {
     writeFileSync(filePath, content, { encoding: 'utf-8', flag: 'wx' });
@@ -262,6 +323,9 @@ heroImage: '${escapedHeroImage}'
   }
 
   console.log(`✅ 文章已建立：${filePath}`);
+  if (draft) {
+    console.log('   （預設為草稿 draft: true，發布前請改為 false 或移除該欄位）');
+  }
 }
 
 main().catch((err) => {
