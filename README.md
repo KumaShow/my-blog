@@ -23,12 +23,18 @@ HI！我是 Benson，一名前端工程師，這裡是我的個人技術筆記�
 ```text
 ├── public/       # 靜態資源（圖片、字型等）
 ├── src/
-│   ├── components/ # 通用元件
-│   ├── content/    # 內容集合（部落格文章等）
-│   ├── layouts/    # 頁面佈局
-│   ├── pages/      # 頁面路由與進入點
-│   ├── styles/     # 全域樣式
-│   └── consts.ts   # 全域常數設定
+│   ├── components/      # 通用元件
+│   ├── content/
+│   │   ├── blog/        # src/content/blog/<category>/<slug>.md(x)
+│   │   └── categories/  # 分類 metadata（每個分類一個 JSON）
+│   ├── layouts/         # 頁面佈局
+│   ├── pages/           # 頁面路由與進入點
+│   ├── styles/          # 全域樣式
+│   ├── content.config.ts # Content Collection schema
+│   ├── consts.ts        # 全域常數設定
+│   └── utils/posts.ts   # 文章查詢、draft 過濾與排序
+├── scripts/
+│   └── new-post.mjs     # 建立部落格文章的腳手架
 └── astro.config.mjs # Astro 設定檔
 ```
 
@@ -43,13 +49,20 @@ HI！我是 Benson，一名前端工程師，這裡是我的個人技術筆記�
 | `npm run preview` | 在本機預覽建置後的版本 |
 | `npm run lint` | 執行 ESLint 檢查程式碼品質 |
 | `npm run format` | 使用 Prettier 格式化程式碼 |
-| `npm run new-post -- "標題" [--slug xxx] [--year yyyy] [--category cat] [--description desc] [--hero-image path]` | 建立新部落格文章，支援自訂 slug、年份、分類、描述、封面圖 |
+| `npm run format:check` | 檢查檔案是否符合 Prettier 格式 |
+| `npm run new-post -- --title "標題" --category demo [選用參數]` | 建立新的部落格文章草稿 |
+
+`new-post` 支援的選用參數包括 `--slug`、`--tags a,b,c`、`--order n`、`--description`、`--hero-image`、`--draft` 與 `--no-draft`。
 
 ## 📝 開發筆記
 
--   文章位於 `src/content/blog/` 目錄下。
--   可使用 `npm run new-post -- "標題"` 建立文章草稿；若未帶標題，腳本會改為互動式輸入。
--   新文章會建立在目前最新年份資料夾下的 `uncategorized/`，之後可再手動搬移到正式分類。
+-   文章必須放在 `src/content/blog/<category>/<slug>.md` 或 `.mdx`。
+-   `category` 由文章路徑的第一層資料夾決定，不要寫入 frontmatter；且必須有對應的 `src/content/categories/<category>.json`。
+-   文章 frontmatter 必須符合 `src/content.config.ts` 的 schema，包含 `title`、`description`、`pubDate`；`updatedDate`、`heroImage`、`tags`、`order` 與 `draft` 可依需求設定。
+-   `tags`、`category` 與 `slug` 使用 URL-safe 的小寫格式，例如 `nodejs` 或 `web-api`；tags 不可重複。
+-   可使用 `npm run new-post -- --title "文章標題" --category demo` 建立文章，腳本預設將文章標記為 `draft: true`。
+-   所有頁面應透過 `src/utils/posts.ts` 的 helpers 取得文章，以統一 draft 過濾、分類驗證與排序規則。
+-   內容架構與文章資料規則請參考 [`docs/blog-design-plan.md`](docs/blog-design-plan.md)；Markdown 語法可參考 [`markdown-style-guide.md`](src/content/blog/demo/markdown-style-guide.md)。
 -   全域資訊（標題、描述）可於 `src/consts.ts` 中修改。
 -   本專案已配置路徑別名（Aliases），例如 `@components` 指向 `src/components`。
 
