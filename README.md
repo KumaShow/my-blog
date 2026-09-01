@@ -46,6 +46,7 @@ HI！我是 Benson，一名前端工程師，這裡是我的個人技術筆記�
 | :--- | :--- |
 | `npm run dev` | 啟動本機開發伺服器 (預設於 `localhost:4321`) |
 | `npm run build` | 建置生產環境版本至 `./dist/` |
+| `npm run verify:production` | 建置並驗證 published 文章與 draft 的 HTML、RSS、sitemap 輸出 |
 | `npm run preview` | 在本機預覽建置後的版本 |
 | `npm run lint` | 執行 ESLint 檢查程式碼品質 |
 | `npm run format` | 使用 Prettier 格式化程式碼 |
@@ -56,7 +57,7 @@ HI！我是 Benson，一名前端工程師，這裡是我的個人技術筆記�
 
 ## 📝 開發筆記
 
--   文章必須放在 `src/content/blog/<category>/<slug>.md` 或 `.mdx`。
+-   文章必須嚴格放在 `src/content/blog/<category>/<slug>.md` 或 `.mdx`，且 `category` 與 `slug` 必須是小寫 URL-safe slug。
 -   `category` 由文章路徑的第一層資料夾決定，不要寫入 frontmatter；且必須有對應的 `src/content/categories/<category>.json`。
 -   文章 frontmatter 必須符合 `src/content.config.ts` 的 schema，包含 `title`、`description`、`pubDate`；`updatedDate`、`heroImage`、`tags`、`order` 與 `draft` 可依需求設定。
 -   `tags`、`category` 與 `slug` 使用 URL-safe 的小寫格式，例如 `nodejs` 或 `web-api`；tags 不可重複。

@@ -3,7 +3,7 @@ title: '第一篇測試文章'
 description: '建站後的第一篇測試文章，用來驗證部落格的文章顯示功能。'
 pubDate: 'Oct 08 2025'
 heroImage: '/blog/blog-placeholder-3.jpg'
-draft: true
+draft: false
 ---
 
 ## 第一篇測試文章

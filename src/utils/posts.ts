@@ -6,13 +6,14 @@
  * 規則定義見 docs/blog-design-plan.md §3.4、§3.5。
  */
 import { getCollection, type CollectionEntry } from 'astro:content';
+import { assertBlogPostPath } from './post-path';
 
 export type BlogPost = CollectionEntry<'blog'>;
 export type Category = CollectionEntry<'categories'>;
 
 /** 由文章 id（路徑）推導 category：路徑第一段為唯一真相來源 */
 export function getCategoryOf(post: BlogPost): string {
-  return post.id.split('/')[0];
+  return assertBlogPostPath(post.id).category;
 }
 
 /**
@@ -24,13 +25,7 @@ export async function assertCategoriesConsistency(posts?: BlogPost[]): Promise<v
   const known = new Set((await getCollection('categories')).map((c) => c.id));
 
   for (const post of allPosts) {
-    if (!post.id.includes('/')) {
-      throw new Error(
-        `文章 "${post.id}" 直接位於 src/content/blog/ 根目錄，` +
-          `請移入分類資料夾（src/content/blog/<category>/）。`
-      );
-    }
-    const category = getCategoryOf(post);
+    const { category } = assertBlogPostPath(post.id);
     if (!known.has(category)) {
       throw new Error(
         `文章 "${post.id}" 的分類 "${category}" 沒有對應的 metadata，` +

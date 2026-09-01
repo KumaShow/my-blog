@@ -2,7 +2,7 @@
 
 > 建立日期：2026-08-07
 > 修訂：2026-08-07 依 `docs/blog-design-plan-review.md` 審查結果修訂（v2）
-> 狀態：Phase 1（資料層）已完成（2026-08-07）；Phase 2 起尚未實作
+> 狀態：Phase 1（資料層、路徑一致性與 production 驗證）已完成（2026-08-31）；Phase 2 起尚未實作
 > 這份文件記錄「技術深淵」部落格從 Astro 官方範本改造成「主題式技術筆記知識庫」的完整規劃，為需求討論與審查修訂後的最終結論。
 
 ---
@@ -127,6 +127,8 @@ const categories = defineCollection({
 
 **一致性驗證（build fail，不用 warning）**：於共用 helper 或 `astro:build:start` 階段檢查——每個 `blog/` 第一層資料夾都必須有對應的 `categories/<name>.json`，缺少時丟出錯誤並提示：「請建立 `src/content/categories/<name>.json`」。
 
+文章 entry id 也必須嚴格符合 `<category>/<slug>` 兩層結構；`category` 與 `slug` 均套用 `^[a-z0-9]+(-[a-z0-9]+)*$`。根目錄文章、額外巢狀層級或含有大寫、底線、點號的路徑，都必須在共用 helper 驗證時讓 build 失敗，並指出問題文章與正確路徑範例。
+
 ### 3.4 共用資料存取 helper（`src/utils/posts.ts`）
 
 所有頁面**一律**透過 helper 取文章，禁止直接呼叫 `getCollection('blog')`，確保 draft 過濾與排序規則只實作一次：
@@ -175,7 +177,7 @@ draft 行為定義：
 
 - Astro config 設 `trailingSlash: 'always'`，build 維持 directory 輸出（`foo/index.html`）；Cloudflare Pages 會將無斜線請求 301 至斜線版本，與 canonical 一致。
 - canonical 使用正規化後的 `Astro.url.pathname`（確保結尾斜線）＋ `Astro.site`。
-- category 與文章 slug 格式：`^[a-z0-9]+(-[a-z0-9]+)*$`（new-post 腳本與 §3.3 驗證把關）。
+- category 與文章 slug 格式：`^[a-z0-9]+(-[a-z0-9]+)*$`，文章路徑嚴格為 `<category>/<slug>`（new-post 腳本與 §3.3 驗證把關）。
 - 上線前接受 category 改名造成的 URL 變更；正式上線後改名需在 Cloudflare Pages `_redirects` 補 301。
 
 Header 導覽列：`首頁｜筆記｜Tags｜關於` ＋ 主題切換按鈕（＋未來的搜尋按鈕、語系切換預留位）。

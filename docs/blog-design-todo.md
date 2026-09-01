@@ -3,7 +3,7 @@
 > 產生日期：2026-08-08  
 > 最後更新：2026-08-31  
 > 依據：`docs/blog-design-plan.md` 與目前工作目錄實作盤點  
-> 狀態：Phase 1 核心資料層已完成，production 驗證基線已通過；仍有手動文章路徑驗證待收尾；Phase 2～5 待實作
+> 狀態：Phase 1 核心資料層、文章路徑一致性與 production 驗證已完成（2026-08-31）；Phase 2～5 待實作
 
 ## 執行原則
 
@@ -35,16 +35,16 @@
 
 - [x] `new-post` 驗證 category 符合 `^[a-z0-9]+(-[a-z0-9]+)*$`，並拒絕路徑分隔符與 dot segment。
 - [x] `new-post` 將文章 slug 正規化為 URL-safe 格式，並防止路徑逸出。
-- [ ] 在 build-time／共用 helper 驗證手動建立的 category 符合 `^[a-z0-9]+(-[a-z0-9]+)*$`。
-- [ ] 在 build-time／共用 helper 驗證手動建立的文章 slug 符合相同格式。
-- [ ] 驗證文章路徑嚴格符合 `<category>/<slug>`，拒絕額外巢狀層級。
-- [ ] 錯誤訊息需指出問題文章與正確路徑範例。
+- [x] 在 build-time／共用 helper 驗證手動建立的 category 符合 `^[a-z0-9]+(-[a-z0-9]+)*$`。
+- [x] 在 build-time／共用 helper 驗證手動建立的文章 slug 符合相同格式。
+- [x] 驗證文章路徑嚴格符合 `<category>/<slug>`，拒絕額外巢狀層級。
+- [x] 錯誤訊息需指出問題文章與正確路徑範例。
 
 驗收條件：
 
 - [x] `new-post` 套用預定的 category／slug URL 規則。
-- [ ] 手動建立的文章與 `new-post` 套用一致的 URL 規則。
-- [ ] 不合法 category、slug 或巢狀路徑會讓 build 明確失敗。
+- [x] 手動建立的文章與 `new-post` 套用一致的 URL 規則。
+- [x] 不合法 category、slug 或巢狀路徑會讓 build 明確失敗。
 
 ### 3. 建立 Phase 1 production 基線
 
@@ -54,10 +54,11 @@
 - [x] 抽查 production HTML 不包含 draft。
 - [x] 抽查 RSS 不包含 draft。
 - [x] 抽查 sitemap 不包含 draft。
+- [x] 以 `demo/first-post.md` 作為 published fixture，透過 `npm run verify:production` 驗證文章頁、RSS item 與 sitemap entry。
 
 驗收條件：三項指令皆成功，且目前 production 輸出皆符合 draft 規則。
 
-> 2026-08-31 驗證註記：目前 3 篇內容全都是 draft，因此已驗證草稿排除，但尚未以至少 1 篇 published 文章驗證正式文章頁、RSS item 與 sitemap entry 的完整生成流程。
+> 2026-08-31 驗證註記：`demo/first-post.md` 為 published fixture；`markdown-style-guide.md` 與 `using-mdx.mdx` 維持 draft。`npm run verify:production` 會檢查 published 文章頁、RSS item、sitemap entry，以及兩篇 draft 不會輸出。
 
 ## P1：Phase 2 全站骨架
 
@@ -224,9 +225,9 @@
 
 ## 建議下一個最小可交付批次
 
-- [ ] 補上 build-time／共用 helper 的 category、slug 與嚴格兩層路徑驗證。
-- [ ] 建立可重現的 published content 驗證案例，補測正式文章頁、RSS item 與 sitemap entry。
-- [ ] 更新本文件與 `docs/blog-design-plan.md` 的 Phase 1 狀態描述，使兩份文件一致。
+- [x] 補上 build-time／共用 helper 的 category、slug 與嚴格兩層路徑驗證。
+- [x] 建立可重現的 published content 驗證案例，補測正式文章頁、RSS item 與 sitemap entry。
+- [x] 更新本文件與 `docs/blog-design-plan.md` 的 Phase 1 狀態描述，使兩份文件一致。
 - [ ] 開始 Phase 2：URL／canonical／OG 基礎、UI 字串字典、Header／Footer、首頁、主題切換與 404。
 
-完成前兩項後，Phase 1 才能視為真正結案，再正式進入 Phase 2。
+Phase 1 已完成；下一批工作可正式進入 Phase 2。

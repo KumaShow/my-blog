@@ -1,8 +1,9 @@
 import { glob } from 'astro/loaders';
 import { defineCollection, z } from 'astro:content';
+import { SLUG_PATTERN } from './utils/post-path';
 
 /** tags 與 category slug 的格式：小寫英數字，連字號分隔 */
-export const SLUG_PATTERN = /^[a-z0-9]+(-[a-z0-9]+)*$/;
+export { SLUG_PATTERN };
 
 const blog = defineCollection({
   // 文章放在 src/content/blog/<category>/<slug>.md，category 由路徑第一段推導

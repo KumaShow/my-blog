@@ -29,5 +29,5 @@ jobs:
       - name: Prettier Check
         run: npm run format:check
 
-      - name: Build Check
-        run: npm run build
+      - name: Production Output Check
+        run: npm run verify:production
