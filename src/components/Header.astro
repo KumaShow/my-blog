@@ -1,6 +1,9 @@
 ---
 import HeaderLink from './HeaderLink.astro';
 import { SITE_TITLE } from '../consts';
+import { getUi } from '../i18n/ui';
+
+const { navigation } = getUi();
 ---
 
 <header>
@@ -9,9 +12,9 @@ import { SITE_TITLE } from '../consts';
       <h2 class="text-red-500"><a href="/">{SITE_TITLE}</a></h2>
 
       <div class="space-x-2">
-        <HeaderLink href="/">首頁</HeaderLink>
-        <HeaderLink href="/blog/">文章</HeaderLink>
-        <HeaderLink href="/about/">關於我</HeaderLink>
+        <HeaderLink href="/">{navigation.home}</HeaderLink>
+        <HeaderLink href="/blog/">{navigation.blog}</HeaderLink>
+        <HeaderLink href="/about/">{navigation.about}</HeaderLink>
       </div>
     </div>
   </nav>

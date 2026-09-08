@@ -75,9 +75,9 @@
 
 相關檔案：新增 `src/i18n/ui.ts`、Header、Footer 與各頁面元件
 
-- [ ] 建立繁中 UI 字典。
-- [ ] 將導覽、按鈕、空狀態與互動提示移至字典。
-- [ ] 現階段不加入 `lang` 或 `translationKey` 等半成品內容欄位。
+- [x] 建立繁中 UI 字典（`src/i18n/ui.ts`）。
+- [x] 將現有導覽、Footer 的 GitHub accessible label 與文章日期標籤移至字典，並預留按鈕、空狀態與互動提示字串；copyright 固定使用全英文，頁面專屬文案維持在各頁面。
+- [x] 現階段不加入 `lang` 或 `translationKey` 等半成品內容欄位。
 
 ### 6. 改版 Header 與 Footer
 
