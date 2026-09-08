@@ -1,7 +1,7 @@
 # 部落格改版 TODO 清單
 
 > 產生日期：2026-08-08  
-> 最後更新：2026-08-31  
+> 最後更新：2026-09-08
 > 依據：`docs/blog-design-plan.md` 與目前工作目錄實作盤點  
 > 狀態：Phase 1 核心資料層、文章路徑一致性與 production 驗證已完成（2026-08-31）；Phase 2～5 待實作
 
@@ -66,10 +66,10 @@
 
 相關檔案：`astro.config.mjs`、`src/components/BaseHead.astro`
 
-- [ ] 設定 `trailingSlash: 'always'`。
-- [ ] 正規化 canonical pathname，確保結尾 `/`。
-- [ ] 修正預設 OG 圖片為 `/blog/blog-placeholder-1.jpg`。
-- [ ] 確認 canonical、Open Graph URL、RSS 連結與站內連結規則一致。
+- [x] 設定 `trailingSlash: 'always'`。
+- [x] 正規化 canonical pathname，確保結尾 `/`。
+- [x] 修正預設 OG 圖片為 `/blog/blog-placeholder-1.jpg`。
+- [x] 確認 canonical、Open Graph URL、RSS 連結與站內連結規則一致。
 
 ### 5. 集中管理 UI 字串
 

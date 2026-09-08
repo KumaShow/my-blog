@@ -275,10 +275,10 @@ npm run new-post -- --title "NodeJS｜全域物件與執行環境" --category no
 - 分類頁與 tags 頁的 title／description 規則（如 `Node.js 筆記｜技術深淵`）。
 - canonical 與 trailing slash 一致性（Phase 2 已定基礎）。
 
-### 已知問題（實作時修正）
+### 已知問題（Phase 2 已完成項目）
 
-- `src/components/BaseHead.astro:15` 預設 OG 圖片為 `/blog-placeholder-1.jpg`，實際檔案在 `/blog/blog-placeholder-1.jpg` → Phase 2 修正。
-- canonical 目前直接用 `Astro.url.pathname`，需配合 `trailingSlash: 'always'` 正規化 → Phase 2 處理。
+- [x] `src/components/BaseHead.astro` 預設 OG 圖片已修正為現有檔案 `/blog/blog-placeholder-1.jpg`（2026-09-08）。
+- [x] canonical 已搭配 `trailingSlash: 'always'` 正規化，Open Graph／Twitter URL 也共用相同 canonical URL（2026-09-08）。
 
 ### Backlog（記錄備查，不排時程）
 

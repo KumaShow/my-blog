@@ -8,6 +8,7 @@ import partytown from '@astrojs/partytown';
 // https://astro.build/config
 export default defineConfig({
   site: 'https://blog.stackabyss.dev',
+  trailingSlash: 'always',
   prefetch: true,
   integrations: [
     mdx(),
